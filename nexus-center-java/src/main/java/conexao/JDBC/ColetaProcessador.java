@@ -14,7 +14,10 @@ import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.dispositivos.DispositivosUsbGrupo;
 import com.github.britooo.looca.api.group.dispositivos.DispositivoUsb;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
@@ -22,26 +25,70 @@ import java.util.List;
  */
 public class ColetaProcessador {
 
-    
+    private DateTimeFormatter formatter;
+    private Integer idMetrica;
     private Double capacidade;
     private Double valorUtilizado;
     private String unidadeMedida;
+    private String dataHora;
     private String tipoComponente;
     private String modeloComponente;
+    private Processador processador;
 
     public ColetaProcessador() {
-        Processador processador = new Processador();
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        processador = new Processador();
 //        this.capacidade = processador.getNumeroCpusFisicas().doubleValue()+processador.getNumeroCpusLogicas().doubleValue();
-        this.capacidade = ((processador.getFrequencia().doubleValue())/1000000000)*(processador.getNumeroCpusFisicas()+processador.getNumeroCpusLogicas());
+        this.idMetrica = null;
+        this.capacidade = ((processador.getFrequencia().doubleValue()) / 1000000000) * (processador.getNumeroCpusFisicas() + processador.getNumeroCpusLogicas());
         this.valorUtilizado = processador.getUso();
         this.unidadeMedida = "GHz";
+        this.dataHora = LocalDateTime.now().format(formatter);
         this.tipoComponente = "Processador";
         this.modeloComponente = processador.getNome();
     }
 
-
-
 //  Para enviar à entidade Configuração Componente:
+        public JdbcTemplate conectHd() {
+        JdbcTemplate conection = new Conexao().getConnection();
+        return conection;
+    }
+        public JdbcTemplate conectHdAzu() {
+        JdbcTemplate conection = new Conexao().getConnectionAzu();
+        return conection;
+    }
+     public void enviaDadosProcessador(Integer fkMaquina, Integer fkEmpresa) {
+        ColetaProcessador coleta = new ColetaProcessador();
+        
+        this.conectHd().update("insert into Metrica values(?,?,?,?,?,?,?)",
+                coleta.idMetrica = null,
+                coleta.valorUtilizado,
+                coleta.unidadeMedida,
+                coleta.dataHora,
+                fkMaquina,
+                fkEmpresa,
+                2);
+        this.conectHdAzu().update("insert into Metrica(valorUtilizado,unidadeMedida,dataHora,fkMaquina,fkEmpresa,fkComponente) values(?,?,?,?,?,?)",
+                
+                coleta.valorUtilizado,
+                coleta.unidadeMedida,
+                coleta.dataHora,
+                fkMaquina,
+                fkEmpresa,
+                2);
+     }
+     public void enviaDadosProcessadorazu(Integer fkMaquina, Integer fkEmpresa) {
+        ColetaProcessador coleta = new ColetaProcessador();
+        
+        this.conectHdAzu().update("insert into Metrica(valorUtilizado,unidadeMedida,dataHora,fkMaquina,fkEmpresa,fkComponente) values(?,?,?,?,?,?)",
+                
+                coleta.valorUtilizado,
+                coleta.unidadeMedida,
+                coleta.dataHora,
+                fkMaquina,
+                fkEmpresa,
+                2);
+     }
     public Double getCapacidade() {
         return capacidade;
     }
@@ -56,11 +103,9 @@ public class ColetaProcessador {
     }
 
 //  Para enviar à entidade Componente:
-    
     public String getTipoComponente() {
         return tipoComponente;
     }
-
 
     public String getModeloComponente() {
         return modeloComponente;
@@ -68,12 +113,7 @@ public class ColetaProcessador {
 
     @Override
     public String toString() {
-        return "ColetaProcessador{" +  ", capacidade=" + capacidade + ", valorUtilizado=" + valorUtilizado + ", unidadeMedida=" + unidadeMedida + ", tipoComponente=" + tipoComponente + ", modeloComponente=" + modeloComponente + '}';
+        return "ColetaProcessador{" + ", capacidade=" + capacidade + ", valorUtilizado=" + valorUtilizado + ", unidadeMedida=" + unidadeMedida + ", tipoComponente=" + tipoComponente + ", modeloComponente=" + modeloComponente + '}';
     }
 
-    
-    
-    
-
-    
 }

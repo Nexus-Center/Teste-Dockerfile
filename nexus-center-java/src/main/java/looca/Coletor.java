@@ -63,9 +63,10 @@ public class Coletor {
         List<Disco> discos = grupoDeDiscos.getDiscos();
 
         for (Disco disco : discos) {
-            System.out.println(disco);
-        }
+           Long discoLeitura = disco.getBytesDeLeitura();
+                   System.out.println(discoLeitura);
 
+        }
         // Querry dados de Processos:
         ProcessoGrupo grupoDeProcessos = looca.getGrupoDeProcessos();
 

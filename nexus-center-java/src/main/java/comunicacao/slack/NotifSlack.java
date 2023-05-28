@@ -3,20 +3,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package comunicacao.slack;
-
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import java.io.IOException;
 import login.UsuarioDAO;
-
 /**
  *
  * @author rafae
  */
 public class NotifSlack {
-
     private String codigo;
 
     public String getCodigo() {
@@ -52,5 +49,4 @@ public class NotifSlack {
     public String toString() {
         return "notifSlack{" + "codigo=" + codigo + '}';
     }
-
 }

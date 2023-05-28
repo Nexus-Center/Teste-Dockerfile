@@ -21,18 +21,23 @@ public class EnviaDados {
     Conexao conexao = new Conexao();
     JdbcTemplate conMysql = conexao.getConnection();
     JdbcTemplate conAzure = conexao.getConnectionAzu();
+    MetricaMouse testeenvio;
+    ColetaHDInfo testeenvio2;
+    ColetaMemoria testeenvio3;
+    ColetaProcessador testeenvio4;
 
-    public void iniciarEnvio() {
-
+    public void iniciarEnvio(Integer fkMaquina,Integer fkEmpresa) {
+        testeenvio = new MetricaMouse(fkMaquina,fkEmpresa);
+        testeenvio2= new ColetaHDInfo();
+        testeenvio3= new ColetaMemoria();
+        testeenvio4= new ColetaProcessador();
         while (true) {
             try {
-                ColetaProcessador coletacontinua = new ColetaProcessador();
-                ColetaMemoria coletacontinuamem = new ColetaMemoria();
-                ColetaHDInfo coletacontinuaHD = new ColetaHDInfo();
-//                conAzure.query(psc, rse)
-                System.out.println(coletacontinua);
-                System.out.println(coletacontinuaHD);
-                System.out.println(coletacontinuamem);
+                testeenvio4.enviaDadosProcessador(fkMaquina, fkEmpresa);
+//                testeenvio4.enviaDadosProcessadorazu(fkMaquina, fkEmpresa);
+                testeenvio3.enviaDadosMem(fkMaquina, fkEmpresa);
+                testeenvio2.enviaDadosTotalhd(fkMaquina, fkEmpresa);
+                testeenvio.enviaDadosMouse(fkMaquina, fkEmpresa);
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -26,7 +26,7 @@ public class Conexao {
         dataSourcemysql.setUrl("jdbc:mysql://localhost:3306/NexusCenter");
 // exemplo para MySql: "jdbc:mysql://localhost:3306/meubanco"
         dataSourcemysql.setUsername("root");
-        dataSourcemysql.setPassword("56674894");
+        dataSourcemysql.setPassword("sptech");
         this.connectionmysql = new JdbcTemplate(dataSourcemysql);
         
         BasicDataSource dataSourceMSSQL = new BasicDataSource();

@@ -26,56 +26,128 @@ import oshi.software.os.OSFileStore;
  * @author rafae
  */
 public class ColetaHDInfo {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private DateTimeFormatter formatter;
+    private Integer idMetrica;
     private Double capacidade;
     private Double valorUtilizado;
     private String unidadeMedida;
     private String tipoComponente;
     private String modeloComponente;
     private String dataHora;
-    
-    
+    private Integer fkMaquina;
+    private Integer fkEmpresa;
+    private Integer fkComponente;
+    private Looca looca;
+    private DiscoGrupo grupoDeDiscos;
+    private Double bytesEscritos;
+    private Double capacidadeocupada;
 
     public ColetaHDInfo() {
-        
-        Looca looca=new Looca();
-        DiscoGrupo grupoDeDiscos = looca.getGrupoDeDiscos();
-        Double bytesEscritos=0.0;
-        Double capacidadeocupada=0.0;
-        dataHora = LocalDateTime.now().format(formatter) ;
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        looca = new Looca();
+        grupoDeDiscos = looca.getGrupoDeDiscos();
+        bytesEscritos = 0.0;
+        capacidadeocupada = 0.0;
 //      Foi nescessário criar duas listas para prosseguir com a coleta de dados.       
-        List <Disco> listadisco=grupoDeDiscos.getDiscos();
+        List<Disco> listadisco = grupoDeDiscos.getDiscos();
         for (Disco disco : listadisco) {
-            bytesEscritos+=disco.getBytesDeEscritas();
-            
+            bytesEscritos += disco.getBytesDeEscritas();
+
         }
-        List <Volume> listavolumed=grupoDeDiscos.getVolumes();
+        List<Volume> listavolumed = grupoDeDiscos.getVolumes();
         for (Volume volume : listavolumed) {
-            capacidadeocupada+=volume.getDisponivel();
-            
+            capacidadeocupada += volume.getDisponivel();
+
         }
-//        this.capacidade = memoria.getNumeroCpusFisicas().doubleValue()+memoria.getNumeroCpusLogicas().doubleValue();
-        this.capacidade = grupoDeDiscos.getTamanhoTotal().doubleValue()/1000000000;
-        this.valorUtilizado = this.capacidade-(capacidadeocupada/1000000000);
+        //        this.capacidade = memoria.getNumeroCpusFisicas().doubleValue()+memoria.getNumeroCpusLogicas().doubleValue();
+        this.idMetrica = null;
+        this.capacidade = grupoDeDiscos.getTamanhoTotal().doubleValue() / 1000000000;
+        this.valorUtilizado = this.capacidade - (capacidadeocupada / 1000000000);
         this.unidadeMedida = "GB";
+        this.dataHora = LocalDateTime.now().format(formatter);
         this.tipoComponente = "HDTotal";
         this.modeloComponente = "Unknow";
+
     }
-    public void enviaDados(JdbcTemplate template,String fkmaquina,String fkempresa,String fkcomponente){
-        template.update("insert into configuracaoComponente(capacidade, unidadeMedida, fkMaquina, fkEmpresa, fkComponente) values (?,?,?,?,?)",
-                        this.capacidade,                        
-                        this.unidadeMedida,
-                        fkmaquina,
-                        fkempresa,
-                        fkcomponente);
-        template.update("insert into configuracaoComponente(valorUtilizado, unidadeMedida, dataHora, fkMaquina, fkEmpresa, fkComponente) values (?,?,?,?,?)",
-                        this.valorUtilizado,
-                        this.unidadeMedida,
-                        this.dataHora,
-                        fkmaquina,
-                        fkempresa,
-                        fkcomponente);
-        
+
+    public ColetaHDInfo(Integer idMetrica, Double capacidade, Double valorUtilizado, String unidadeMedida, String tipoComponente, String modeloComponente) {
+        this.idMetrica = idMetrica;
+        this.capacidade = capacidade;
+        this.valorUtilizado = valorUtilizado;
+        this.unidadeMedida = unidadeMedida;
+        this.tipoComponente = tipoComponente;
+        this.modeloComponente = modeloComponente;
+    }
+
+    public JdbcTemplate conectHd() {
+        JdbcTemplate conection = new Conexao().getConnection();
+        return conection;
+    }
+
+    public JdbcTemplate conectHdazu() {
+        JdbcTemplate conection = new Conexao().getConnectionAzu();
+        return conection;
+    }
+
+    public void enviaDadosTotalhd(Integer fkMaquina, Integer fkEmpresa) {
+        ColetaHDInfo coleta = new ColetaHDInfo();
+
+        this.conectHd().update("insert into Metrica values(?,?,?,?,?,?,?)",
+                coleta.idMetrica = null,
+                coleta.valorUtilizado,
+                coleta.unidadeMedida,
+                coleta.dataHora,
+                fkMaquina,
+                fkEmpresa,
+                1);
+        this.conectHdazu().update("insert into Metrica(valorUtilizado,unidadeMedida,dataHora,fkMaquina,fkEmpresa,fkComponente) values(?,?,?,?,?,?)",
+                coleta.valorUtilizado,
+                coleta.unidadeMedida,
+                coleta.dataHora,
+                fkMaquina,
+                fkEmpresa.toString(),
+                1);
+    }
+//        template.update("insert into configuracaoComponente(capacidade, unidadeMedida, fkMaquina, fkEmpresa, fkComponente) values (?,?,?,?,?)",
+//                        this.capacidade,                        
+//                        this.unidadeMedida,
+//                        fkmaquina,
+//                        fkempresa,
+//                        fkcomponente);
+//        template.update("insert into configuracaoComponente(valorUtilizado, unidadeMedida, dataHora, fkMaquina, fkEmpresa, fkComponente) values (?,?,?,?,?)",
+//                        this.valorUtilizado,
+//                        this.unidadeMedida,
+//                        this.dataHora,
+//                        fkmaquina,
+//                        fkempresa,
+//                        fkcomponente);
+//        
+
+    public void enviaDadosTotalhdazu(Integer fkMaquina, Integer fkEmpresa) {
+        ColetaHDInfo coleta = new ColetaHDInfo();
+
+    }
+
+    public void enviadadosporHD() {
+
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        looca = new Looca();
+        grupoDeDiscos = looca.getGrupoDeDiscos();
+        bytesEscritos = 0.0;
+        capacidadeocupada = 0.0;
+        dataHora = LocalDateTime.now().format(formatter);
+//      Foi nescessário criar duas listas para prosseguir com a coleta de dados.       
+        List<Disco> listadisco = grupoDeDiscos.getDiscos();
+        for (Disco disco : listadisco) {
+            bytesEscritos += disco.getBytesDeEscritas();
+
+        }
+        List<Volume> listavolumed = grupoDeDiscos.getVolumes();
+        for (Volume volume : listavolumed) {
+            capacidadeocupada += volume.getDisponivel();
+
+        }
     }
 
     public Double getCapacidade() {
@@ -102,6 +174,5 @@ public class ColetaHDInfo {
     public String toString() {
         return "ColetaHD{" + "capacidade=" + capacidade + ", valorUtilizado=" + valorUtilizado + ", unidadeMedida=" + unidadeMedida + ", tipoComponente=" + tipoComponente + ", modeloComponente=" + modeloComponente + '}';
     }
-    
-}
 
+}

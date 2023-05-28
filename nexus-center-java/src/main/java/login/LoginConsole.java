@@ -45,11 +45,11 @@ public class LoginConsole {
     public static void main(String[] args) {
         Scanner leitor01 = new Scanner(System.in);
         
-            System.out.println("Digite o patrimônio da sua máquina:\n");
-            String patrimonio_digitado = leitor01.nextLine();
+        System.out.println("Digite o patrimônio da sua máquina:\n");
+        String patrimonio_digitado = leitor01.nextLine();
             
-            System.out.println("Digite a senha:\n");
-            String senha_digitada = leitor01.nextLine();
+        System.out.println("Digite a senha:\n");
+        String senha_digitada = leitor01.nextLine();
 
         //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Validação Log
@@ -62,8 +62,10 @@ public class LoginConsole {
         try {
             log.login(rsusariodaos, rsusariodaos.next());
         } catch (SQLException ex) {
-            Logger.getLogger(LoginJframe.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Erro");
         }
+        
+        //--------------------------------------------------------------------------------------------------------
         try {
             // Objetos JDBC
             Conexao conexao = new Conexao();
@@ -88,17 +90,10 @@ public class LoginConsole {
             
             
             
-            
-            
-            
-            
-            Scanner leitor02 = new Scanner(System.in);
-            
-            System.out.println("Digite o patrimônio da sua máquina:\n");
-            String patrimonio_maquina = leitor02.nextLine();
-            
-            System.out.println("Digite a senha:\n");
-            String senha_maquina = leitor02.nextLine();
+        
+            String patrimonio_maquina = patrimonio_digitado;
+ 
+            String senha_maquina = senha_digitada;
 
             Maquina maquina = new Maquina(patrimonio_maquina, senha_maquina);// Adicionado Construtor na classe máquina
 
@@ -106,10 +101,8 @@ public class LoginConsole {
             ResultSet rsusariodao = objUsuarioDAO.autenticsacaoUsuario(maquina);// Nesta linha é instanciado objeto com parâmetros provenientes da consulta com a Azure
 
             if (rsusariodao.next()) {
-//                //lOGADO
-//                ImageIcon icon = new ImageIcon(getClass().getResource("/assets/verificado.png"));
-                JOptionPane.showMessageDialog(null, "Login realizado!",
-                        "Seja Bem-Vindo!", JOptionPane.INFORMATION_MESSAGE);
+                // LOGADO
+                System.out.println("Login realizado!");
 
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 //Setando Atributos
@@ -410,17 +403,15 @@ public class LoginConsole {
                 System.out.println(maquinas);
 
                 EnviaDados inicio = new EnviaDados();
-                inicio.iniciarEnvio();
+                inicio.iniciarEnvio(maquina.getIdMaquina(),maquina.getFkEmpresa());
 
             } else {
-//                // Erro
-//                ImageIcon icon = new ImageIcon(getClass().getResource("/assets/erro.png"));
-                JOptionPane.showMessageDialog(null, "Login Inválido",
-                        "Erro", JOptionPane.INFORMATION_MESSAGE);
+                // ERRO NO LOGIN
+                System.out.println("Erro ao realizar login!");
             }
 
         } catch (Exception erro) {
-            JOptionPane.showMessageDialog(null, "erro");
+            System.out.println("Erro");
         }
 
 //      O Loop deveráser inicializado aqui depois de todas as validações possíveis
